@@ -60,4 +60,8 @@ public class GameTile : MonoBehaviour {
 	public bool canMergeWith(VirtualTile v, VirtualTile.Orientation orientation) {
 		return data.canMerge (v, orientation);
 	}
+
+	public VirtualTile GetData() {
+		return data;
+	}
 }

@@ -19,6 +19,7 @@ public class HandTile : GameTile {
 		//clear tile...It has beem merged.
 		data = new VirtualTile (0, 0, 0);
 		ApplyColors ();
+		SetActive (false);
 
 		//wait
 		yield return new WaitForSeconds (respawnAfter);
