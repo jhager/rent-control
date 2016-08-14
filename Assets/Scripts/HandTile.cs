@@ -10,12 +10,12 @@ public class HandTile : GameTile {
 	public bool initalized = false;
 	public float respawnAfter = 2.0f;
 
-	void init() {
+	public void init() {
 		data = new VirtualTile ();
 		ApplyColors ();
 	}
 
-	public IEnumerator reinit(float waitTime) {
+	 IEnumerator reinit(float waitTime) {
 		//clear tile...It has beem merged.
 		data = new VirtualTile (0, 0, 0);
 		ApplyColors ();

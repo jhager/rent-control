@@ -26,6 +26,11 @@ public class GameTile : MonoBehaviour {
 		transform.FindChild ("Cube44").GetComponent<Renderer> ().material.color = data.colorAt (VirtualTile.SQUARE44);
 	}
 
+	public void init() {
+		data = new VirtualTile (0, 0, 0);
+		ApplyColors ();
+	}
+
 	// Use this for initialization
 	void Start () {
 		Material m = new Material(Shader.Find("Transparent/Diffuse"));
@@ -35,8 +40,7 @@ public class GameTile : MonoBehaviour {
 			child.GetComponent<Renderer>().material = m;
 		}
 			
-		data = new VirtualTile (0, 0, 0);
-		ApplyColors ();
+		init ();
 		halo = (Behaviour)GetComponent ("Halo");
 		SetActive (false);
 	}

@@ -7,18 +7,25 @@ public class PieceDirector : MonoBehaviour {
 	public static int NUMBER_OF_TILE_PER_PLAYER = 3;
 	public static int TOTAL_TILES = NUMBER_OF_PLAYERS * NUMBER_OF_TILE_PER_PLAYER;
 
-	public GameTile centerBoard1;
-	public GameTile centerBoard2;
+	private GameTile centerBoard1;
+	private GameTile centerBoard2;
+
+	public int maxTurnsPerGame = 15;
 
 	private HandTile activePiece;
 
 	private int currentPlayersTurn = 0;
+	private int totalTurnCounter = 0;
 
 	private HandTile[] allPlayerPieces = new HandTile[9];
 	private Text scoreText;
+	private Text gameOverText;
 
 	// Use this for initialization
 	void Start () {
+		centerBoard1 = (GameTile)GameObject.Find ("CenterGameBoard1").GetComponent<GameTile> ();
+		centerBoard2 = (GameTile)GameObject.Find ("CenterGameBoard2").GetComponent<GameTile> ();
+
 		allPlayerPieces [0] = (HandTile) GameObject.Find ("Player1HandTile1").GetComponent<HandTile>();
 		allPlayerPieces [1] = (HandTile) GameObject.Find ("Player1HandTile2").GetComponent<HandTile>();
 		allPlayerPieces [2] = (HandTile) GameObject.Find ("Player1HandTile3").GetComponent<HandTile>();
@@ -30,7 +37,22 @@ public class PieceDirector : MonoBehaviour {
 		allPlayerPieces [8] = (HandTile) GameObject.Find ("Player3HandTile3").GetComponent<HandTile>();
 
 		scoreText = GameObject.Find("Score").GetComponent<Text>();
+		gameOverText = GameObject.Find ("GameOver").GetComponent<Text> ();
+		gameOverText.enabled = false;
+	}
 
+	void ResetGame() {
+		for (int i=0; i< TOTAL_TILES; i++) {
+			allPlayerPieces [i].init();
+		}
+
+		centerBoard1.init ();
+		centerBoard2.init ();
+
+		currentPlayersTurn = 0;
+		totalTurnCounter = 0;
+		activePiece = null;
+		gameOverText.enabled = false;
 	}
 
 	//Resets the current Player's piece.  They cannot match the pieces just
@@ -38,13 +60,12 @@ public class PieceDirector : MonoBehaviour {
 		for (int i = 0; i < NUMBER_OF_TILE_PER_PLAYER; i++) {
 			int index = i + currentPlayersTurn * NUMBER_OF_PLAYERS;
 
-
 			if (lastPlayedPiece.hasRed () && allPlayerPieces [index].GetData ().hasRed ()) {
-				StartCoroutine( allPlayerPieces [index].reinit (0.01f));
+				allPlayerPieces [index].init();
 			} else if (lastPlayedPiece.hasBlue () && allPlayerPieces [index].GetData ().hasBlue ()) {
-				StartCoroutine(allPlayerPieces [index].reinit (0.01f));
+				allPlayerPieces [index].init();
 			} else if (lastPlayedPiece.hasYellow () && allPlayerPieces [index].GetData ().hasYellow ()) {
-				StartCoroutine(allPlayerPieces [index].reinit (0.01f));
+				allPlayerPieces [index].init();
 			}
 		}
 	}
@@ -57,6 +78,7 @@ public class PieceDirector : MonoBehaviour {
 		activePiece = null;
 	
 		if (board.canMergeWith (piece.GetData (), orientation)) {
+			totalTurnCounter++;
 			VirtualTile lastPlayedPiece = new VirtualTile(piece.GetData());
 
 			piece.MergeWithBoard (board, orientation);
@@ -66,6 +88,8 @@ public class PieceDirector : MonoBehaviour {
 			ResetPieces (lastPlayedPiece);
 
 			RecalculateScore ();
+
+			CheckForGameOver ();
 		} else {
 			piece.SetActive (false);
 		}
@@ -74,6 +98,33 @@ public class PieceDirector : MonoBehaviour {
 	void RecalculateScore() {
 		int score = centerBoard1.GetData ().Score () + centerBoard2.GetData ().Score ();
 		scoreText.text = "Score: " + score;
+	}
+
+	void CheckForGameOver() {
+		bool playable = false;
+		for (int i = 0; i < NUMBER_OF_TILE_PER_PLAYER; i++) {
+			int index = i + currentPlayersTurn * NUMBER_OF_PLAYERS;
+
+			VirtualTile pieceToCheck = allPlayerPieces [index].GetData();
+
+			playable |= centerBoard1.canMergeWith (pieceToCheck, VirtualTile.Orientation.Up);
+			playable |= centerBoard1.canMergeWith (pieceToCheck, VirtualTile.Orientation.UpsideDown);
+			playable |= centerBoard1.canMergeWith (pieceToCheck, VirtualTile.Orientation.Clockwise90);
+			playable |= centerBoard1.canMergeWith (pieceToCheck, VirtualTile.Orientation.CounterClockwise90);
+
+			playable |= centerBoard2.canMergeWith (pieceToCheck, VirtualTile.Orientation.Up);
+			playable |= centerBoard2.canMergeWith (pieceToCheck, VirtualTile.Orientation.UpsideDown);
+			playable |= centerBoard2.canMergeWith (pieceToCheck, VirtualTile.Orientation.Clockwise90);
+			playable |= centerBoard2.canMergeWith (pieceToCheck, VirtualTile.Orientation.CounterClockwise90);
+
+			if (playable) {
+				break;
+			}
+		}
+
+		if (!playable || totalTurnCounter >= maxTurnsPerGame) {
+			gameOverText.enabled = true;
+		}
 	}
 
 	void AdjustActivePiece (int position)
@@ -88,6 +139,12 @@ public class PieceDirector : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+		if (Input.GetKeyDown (KeyCode.Return) && gameOverText.enabled) {
+			ResetGame ();
+		}
+		if (gameOverText.enabled) {
+			return;
+		}
 		if (Input.GetKeyDown (KeyCode.A)) {
 			AdjustActivePiece (0);
 		} else if (Input.GetKeyDown (KeyCode.S)) {
