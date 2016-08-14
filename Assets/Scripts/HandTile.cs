@@ -15,23 +15,29 @@ public class HandTile : GameTile {
 		ApplyColors ();
 	}
 
-	IEnumerator reinit() {
+	public IEnumerator reinit(float waitTime) {
 		//clear tile...It has beem merged.
 		data = new VirtualTile (0, 0, 0);
 		ApplyColors ();
 		SetActive (false);
 
 		//wait
-		yield return new WaitForSeconds (respawnAfter);
+		yield return new WaitForSeconds (waitTime);
 		init ();
+	}
+
+	public void MergeWithBoard (GameTile boardToMergeWith, VirtualTile.Orientation orientation)
+	{
+		if (boardToMergeWith.canMergeWith (data, orientation)) {
+			boardToMergeWith.mergeWith (data, orientation);
+			StartCoroutine (reinit (respawnAfter));
+		}
 	}
 
 	public void MergeWithBoard (GameTile boardToMergeWith)
 	{
-		if (boardToMergeWith.canMergeWith (data, VirtualTile.Orientation.Up)) {
-			boardToMergeWith.mergeWith (data, VirtualTile.Orientation.Up);
-			StartCoroutine (reinit ());
-		}
+		VirtualTile.Orientation orientation = VirtualTile.Orientation.Up;
+		MergeWithBoard (boardToMergeWith, orientation);
 	}
 
 	public void Reorient (VirtualTile.Orientation orientation)

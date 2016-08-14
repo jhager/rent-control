@@ -33,6 +33,22 @@ public class PieceDirector : MonoBehaviour {
 
 	}
 
+	//Resets the current Player's piece.  They cannot match the pieces just
+	void ResetPieces(VirtualTile lastPlayedPiece) {
+		for (int i = 0; i < NUMBER_OF_TILE_PER_PLAYER; i++) {
+			int index = i + currentPlayersTurn * NUMBER_OF_PLAYERS;
+
+
+			if (lastPlayedPiece.hasRed () && allPlayerPieces [index].GetData ().hasRed ()) {
+				StartCoroutine( allPlayerPieces [index].reinit (0.01f));
+			} else if (lastPlayedPiece.hasBlue () && allPlayerPieces [index].GetData ().hasBlue ()) {
+				StartCoroutine(allPlayerPieces [index].reinit (0.01f));
+			} else if (lastPlayedPiece.hasYellow () && allPlayerPieces [index].GetData ().hasYellow ()) {
+				StartCoroutine(allPlayerPieces [index].reinit (0.01f));
+			}
+		}
+	}
+
 	public void MergeRequested(HandTile piece, GameTile board, VirtualTile.Orientation orientation) {
 		//todo animate merge.
 		activePiece.SetActive (false);
@@ -40,10 +56,14 @@ public class PieceDirector : MonoBehaviour {
 		activePiece.SetActive (true);
 		activePiece = null;
 	
-		if (board.canMergeWith (piece.GetData (), VirtualTile.Orientation.Up)) {
-			piece.MergeWithBoard (board);
+		if (board.canMergeWith (piece.GetData (), orientation)) {
+			VirtualTile lastPlayedPiece = new VirtualTile(piece.GetData());
+
+			piece.MergeWithBoard (board, orientation);
 			currentPlayersTurn++;
 			currentPlayersTurn = currentPlayersTurn % NUMBER_OF_PLAYERS;
+
+			ResetPieces (lastPlayedPiece);
 
 			RecalculateScore ();
 		} else {

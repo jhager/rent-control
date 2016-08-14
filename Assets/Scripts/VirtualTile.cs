@@ -163,6 +163,12 @@ public class VirtualTile  {
 		this.blueComponent = blue;
 	}
 
+	public VirtualTile(VirtualTile toClone) {
+		this.redComponent = toClone.redComponent;
+		this.yellowComponent = toClone.yellowComponent;
+		this.blueComponent = toClone.blueComponent;
+	}
+
 	static bool isOn (ushort input, ushort mask)
 	{
 		return (input & mask) == mask;
@@ -290,5 +296,17 @@ public class VirtualTile  {
 		value = value - ((value >> 1) & 0x55555555);
 		value = (value & 0x33333333) + ((value >> 2) & 0x33333333);
 		return (((value + (value >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
+	}
+
+	public bool hasBlue() {
+		return blueComponent != 0;
+	}
+
+	public bool hasRed() {
+		return redComponent != 0;
+	}
+
+	public bool hasYellow() {
+		return yellowComponent != 0;
 	}
 }
