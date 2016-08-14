@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class PieceDirector : MonoBehaviour {
 	public static int NUMBER_OF_PLAYERS = 3;
@@ -14,6 +15,7 @@ public class PieceDirector : MonoBehaviour {
 	private int currentPlayersTurn = 0;
 
 	private HandTile[] allPlayerPieces = new HandTile[9];
+	private Text scoreText;
 
 	// Use this for initialization
 	void Start () {
@@ -26,6 +28,8 @@ public class PieceDirector : MonoBehaviour {
 		allPlayerPieces [6] = (HandTile) GameObject.Find ("Player3HandTile1").GetComponent<HandTile>();
 		allPlayerPieces [7] = (HandTile) GameObject.Find ("Player3HandTile2").GetComponent<HandTile>();
 		allPlayerPieces [8] = (HandTile) GameObject.Find ("Player3HandTile3").GetComponent<HandTile>();
+
+		scoreText = GameObject.Find("Score").GetComponent<Text>();
 
 	}
 
@@ -40,9 +44,16 @@ public class PieceDirector : MonoBehaviour {
 			piece.MergeWithBoard (board);
 			currentPlayersTurn++;
 			currentPlayersTurn = currentPlayersTurn % NUMBER_OF_PLAYERS;
+
+			RecalculateScore ();
 		} else {
 			piece.SetActive (false);
 		}
+	}
+
+	void RecalculateScore() {
+		int score = centerBoard1.GetData ().Score () + centerBoard2.GetData ().Score ();
+		scoreText.text = "Score: " + score;
 	}
 
 	void AdjustActivePiece (int position)
