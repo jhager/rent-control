@@ -21,6 +21,8 @@ public class PieceDirector : MonoBehaviour {
 	private Text scoreText;
 	private Text gameOverText;
 
+	public NetworkedClient network;
+
 	// Use this for initialization
 	void Start () {
 		centerBoard1 = (GameTile)GameObject.Find ("CenterGameBoard1").GetComponent<GameTile> ();
@@ -29,6 +31,7 @@ public class PieceDirector : MonoBehaviour {
 		allPlayerPieces [0] = (HandTile) GameObject.Find ("Player1HandTile1").GetComponent<HandTile>();
 		allPlayerPieces [1] = (HandTile) GameObject.Find ("Player1HandTile2").GetComponent<HandTile>();
 		allPlayerPieces [2] = (HandTile) GameObject.Find ("Player1HandTile3").GetComponent<HandTile>();
+        
 		allPlayerPieces [3] = (HandTile) GameObject.Find ("Player2HandTile1").GetComponent<HandTile>();
 		allPlayerPieces [4] = (HandTile) GameObject.Find ("Player2HandTile2").GetComponent<HandTile>();
 		allPlayerPieces [5] = (HandTile) GameObject.Find ("Player2HandTile3").GetComponent<HandTile>();
@@ -38,7 +41,13 @@ public class PieceDirector : MonoBehaviour {
 
 		scoreText = GameObject.Find("Score").GetComponent<Text>();
 		gameOverText = GameObject.Find ("GameOver").GetComponent<Text> ();
-		gameOverText.enabled = false;
+		if (gameOverText != null) {
+			gameOverText.enabled = false;
+		}
+		if (network != null) {
+			network.OnIncomingEvent += OnIncomingEvent;
+		}
+
 	}
 
 	void ResetGame() {
@@ -97,7 +106,10 @@ public class PieceDirector : MonoBehaviour {
 
 	void RecalculateScore() {
 		int score = centerBoard1.GetData ().Score () + centerBoard2.GetData ().Score ();
-		scoreText.text = "Score: " + score;
+        if (scoreText != null)
+        {
+            scoreText.text = "Score: " + score;
+        }
 	}
 
 	void CheckForGameOver() {
@@ -139,10 +151,10 @@ public class PieceDirector : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetKeyDown (KeyCode.Return) && gameOverText.enabled) {
+		if (Input.GetKeyDown (KeyCode.Return) && gameOverText != null && gameOverText.enabled) {
 			ResetGame ();
 		}
-		if (gameOverText.enabled) {
+		if (gameOverText != null && gameOverText.enabled) {
 			return;
 		}
 		if (Input.GetKeyDown (KeyCode.A)) {
@@ -172,4 +184,42 @@ public class PieceDirector : MonoBehaviour {
 			activePiece.Reorient (VirtualTile.Orientation.UpsideDown);
 		}
 	}
+
+	public GameState GetGameState() {
+		GameState results = new GameState ();
+		results.boards.Add(centerBoard1.GetData ().GetPieceState ());
+		results.boards.Add(centerBoard2.GetData ().GetPieceState ());
+
+		for (int i=0; i< TOTAL_TILES; i++) {
+            if (allPlayerPieces[i] != null)
+            {
+                results.pieces.Add(allPlayerPieces[i].GetData().GetPieceState());
+            }
+		}
+
+		results.turn = totalTurnCounter;
+
+		return results;
+	}
+
+    public void UpdateGameState(GameState gs)
+    {
+        centerBoard1.SetPieceState(gs.boards[0]);
+        centerBoard2.SetPieceState(gs.boards[1]);
+
+        for (int i = 0; i < TOTAL_TILES; i++)
+        {
+            if (allPlayerPieces[i] != null)
+            {
+                allPlayerPieces[i].SetPieceState(gs.pieces[i]);
+            }
+        }
+        this.totalTurnCounter = gs.turn;
+    }
+
+	private void OnIncomingEvent(object sender, GameEvent e)
+	{
+        UpdateGameState(e.gameState);
+	}
+
 }

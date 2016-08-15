@@ -33,12 +33,6 @@ public class GameTile : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		Material m = new Material(Shader.Find("Transparent/Diffuse"));
-		m.color = VirtualTile.colorless;
-
-		foreach (Transform child in GetComponentInChildren<Transform>()) {
-			child.GetComponent<Renderer>().material = m;
-		}
 			
 		init ();
 		halo = (Behaviour)GetComponent ("Halo");
@@ -68,4 +62,10 @@ public class GameTile : MonoBehaviour {
 	public VirtualTile GetData() {
 		return data;
 	}
+
+    public void SetPieceState(PieceState data)
+    {
+        this.data.SetPieceState(data);
+        ApplyColors();
+    }
 }

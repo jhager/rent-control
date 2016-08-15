@@ -1,12 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 /**
  * This tile represents both the card that is in the player's hand
  * and the tile on the table.  
  */
 public class VirtualTile  {
-	
+
+
 	public enum Orientation {Up = 0, Clockwise90 = 1, UpsideDown = 2, CounterClockwise90 = 3};
 
 	public static Color red = new Color(0.87f, 0.36f, 0.26f, 0.9f);
@@ -55,6 +57,8 @@ public class VirtualTile  {
 	ushort redComponent = 0;
 	ushort yellowComponent = 0;
 	ushort blueComponent = 0;
+
+	string id;
 
 	//left in case 4 size pieces make the game not fun to play.  There is a 50/50 chance of the 
 	//size being 4 right now, since it is equal distribution of all possible playing pieces.  
@@ -142,8 +146,10 @@ public class VirtualTile  {
 	 * Creates a random initial Tile.  It will be one of the primary colors.   
 	 **/
 	public VirtualTile() {
-		ushort filledGrid = (ushort) pieceLibrary[Random.Range(0, pieceLibrary.Length)];
-		switch (Random.Range (0, 3)) 
+		id = Guid.NewGuid().ToString();
+
+		ushort filledGrid = (ushort) pieceLibrary[UnityEngine.Random.Range(0, pieceLibrary.Length)];
+		switch (UnityEngine.Random.Range (0, 3)) 
 		{
 			case 0:
 				redComponent = filledGrid;
@@ -158,12 +164,16 @@ public class VirtualTile  {
 	}
 		
 	public VirtualTile(ushort red, ushort yellow, ushort blue)  {
+		id = Guid.NewGuid().ToString();
+		 
 		this.redComponent = red;
 		this.yellowComponent = yellow;
 		this.blueComponent = blue;
 	}
 
 	public VirtualTile(VirtualTile toClone) {
+		id = Guid.NewGuid().ToString();
+
 		this.redComponent = toClone.redComponent;
 		this.yellowComponent = toClone.yellowComponent;
 		this.blueComponent = toClone.blueComponent;
@@ -309,4 +319,16 @@ public class VirtualTile  {
 	public bool hasYellow() {
 		return yellowComponent != 0;
 	}
+
+	public PieceState GetPieceState() {
+		return new PieceState (id, redComponent, yellowComponent, blueComponent);
+	}
+
+    public void SetPieceState(PieceState state)
+    {
+        id = state.id;
+        redComponent = state.red;
+        yellowComponent = state.yellow;
+        blueComponent = state.blue;
+    }
 }
