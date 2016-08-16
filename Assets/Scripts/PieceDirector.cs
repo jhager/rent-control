@@ -105,14 +105,12 @@ public class PieceDirector : MonoBehaviour {
 		activePiece = null;
 	
 		if (board.canMergeWith (piece.GetData (), orientation)) {
-			totalTurnCounter++;
 			VirtualTile lastPlayedPiece = new VirtualTile(piece.GetData());
 
-			piece.MergeWithBoard (board, orientation);
 			piece.OnNewTileEent += OnNewTileEent;
+			piece.MergeWithBoard (board, orientation);
 
-			currentPlayersTurn++;
-			currentPlayersTurn = currentPlayersTurn % NUMBER_OF_PLAYERS;
+			SetTotalTurnCounter (totalTurnCounter + 1);
 
 			ResetPieces (lastPlayedPiece);
 
@@ -124,6 +122,11 @@ public class PieceDirector : MonoBehaviour {
 		} else {
 			piece.SetActive (false);
 		}
+	}
+
+	private void SetTotalTurnCounter(int turnCounter) {
+		this.totalTurnCounter = turnCounter;
+		currentPlayersTurn = this.totalTurnCounter % NUMBER_OF_PLAYERS;
 	}
 
 	void RecalculateScore() {
@@ -241,7 +244,7 @@ public class PieceDirector : MonoBehaviour {
                 allPlayerPieces[i].SetPieceState(gs.pieces[i]);
             }
         }
-        this.totalTurnCounter = gs.turn;
+		SetTotalTurnCounter(gs.turn);
 
 		RecalculateScore ();
     }
