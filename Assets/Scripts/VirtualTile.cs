@@ -17,10 +17,9 @@ public class VirtualTile  {
 	public static Color green = new Color(0.34f, 0.64f, 0.34f, 0.9f);
 	public static Color blue = new Color(0.27f, 0.54f, 0.86f, 0.9f);
 	public static Color violet = new Color (0.65F, 0.38f, 0.70f, 0.9f);
-	public static Color colorless = new Color(0.87f, 0.89f, 0.91f, 0.9f);
+	public static Color colorless = new Color(0.4f, 0.4f, 0.4f, 0.5f);
 
-
-	static ushort ZERO = 0;
+    static ushort ZERO = 0;
 
 	public static ushort SQUARE11 = 1;
 	public static ushort SQUARE12 = 2;
@@ -297,7 +296,36 @@ public class VirtualTile  {
 		return colorless;
 	}
 
-	public int Score() {
+    public string tennantAt(ushort location)
+    {
+        if (isOn(redComponent, location) && isOn(blueComponent, location))
+        {
+            return "Purple";
+        }
+        if (isOn(redComponent, location) && isOn(yellowComponent, location))
+        {
+            return "Orange";
+        }
+        if (isOn(yellowComponent, location) && isOn(blueComponent, location))
+        {
+            return "Green";
+        }
+        if (isOn(redComponent, location))
+        {
+            return "Red";
+        }
+        if (isOn(blueComponent, location))
+        {
+            return "Blue";
+        }
+        if (isOn(yellowComponent, location))
+        {
+            return "Yellow";
+        }
+        return "";
+    }
+
+    public int Score() {
 		return HammingWeight (redComponent) + HammingWeight (blueComponent) + HammingWeight (yellowComponent);
 	}
 

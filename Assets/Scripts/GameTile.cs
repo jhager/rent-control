@@ -5,28 +5,49 @@ public class GameTile : MonoBehaviour {
 
 	protected VirtualTile data;
 	Behaviour halo;
-
+    
 	protected void ApplyColors ()
 	{
-		transform.FindChild ("Cube11").GetComponent<Renderer> ().material.color = data.colorAt (VirtualTile.SQUARE11);
-		transform.FindChild ("Cube12").GetComponent<Renderer> ().material.color = data.colorAt (VirtualTile.SQUARE12);
-		transform.FindChild ("Cube13").GetComponent<Renderer> ().material.color = data.colorAt (VirtualTile.SQUARE13);
-		transform.FindChild ("Cube14").GetComponent<Renderer> ().material.color = data.colorAt (VirtualTile.SQUARE14);
-		transform.FindChild ("Cube21").GetComponent<Renderer> ().material.color = data.colorAt (VirtualTile.SQUARE21);
-		transform.FindChild ("Cube22").GetComponent<Renderer> ().material.color = data.colorAt (VirtualTile.SQUARE22);
-		transform.FindChild ("Cube23").GetComponent<Renderer> ().material.color = data.colorAt (VirtualTile.SQUARE23);
-		transform.FindChild ("Cube24").GetComponent<Renderer> ().material.color = data.colorAt (VirtualTile.SQUARE24);
-		transform.FindChild ("Cube31").GetComponent<Renderer> ().material.color = data.colorAt (VirtualTile.SQUARE31);
-		transform.FindChild ("Cube32").GetComponent<Renderer> ().material.color = data.colorAt (VirtualTile.SQUARE32);
-		transform.FindChild ("Cube33").GetComponent<Renderer> ().material.color = data.colorAt (VirtualTile.SQUARE33);
-		transform.FindChild ("Cube34").GetComponent<Renderer> ().material.color = data.colorAt (VirtualTile.SQUARE34);
-		transform.FindChild ("Cube41").GetComponent<Renderer> ().material.color = data.colorAt (VirtualTile.SQUARE41);
-		transform.FindChild ("Cube42").GetComponent<Renderer> ().material.color = data.colorAt (VirtualTile.SQUARE42);
-		transform.FindChild ("Cube43").GetComponent<Renderer> ().material.color = data.colorAt (VirtualTile.SQUARE43);
-		transform.FindChild ("Cube44").GetComponent<Renderer> ().material.color = data.colorAt (VirtualTile.SQUARE44);
-	}
+        updateLocation("Cube11", VirtualTile.SQUARE11);
+        updateLocation("Cube12", VirtualTile.SQUARE12);        
+        updateLocation("Cube13", VirtualTile.SQUARE13);        
+        updateLocation("Cube14", VirtualTile.SQUARE14);
+        
+        updateLocation("Cube21", VirtualTile.SQUARE21);
+		updateLocation("Cube22", VirtualTile.SQUARE22);
+		updateLocation("Cube23", VirtualTile.SQUARE23);
+		updateLocation("Cube24", VirtualTile.SQUARE24);
 
-	public void init() {
+        updateLocation("Cube31", VirtualTile.SQUARE31);
+		updateLocation("Cube32", VirtualTile.SQUARE32);
+		updateLocation("Cube33", VirtualTile.SQUARE33);
+		updateLocation("Cube34", VirtualTile.SQUARE34);
+
+        updateLocation("Cube41", VirtualTile.SQUARE41);
+		updateLocation("Cube42", VirtualTile.SQUARE42);
+		updateLocation("Cube43", VirtualTile.SQUARE43);
+		updateLocation("Cube44", VirtualTile.SQUARE44);
+    }
+
+    private void updateLocation( string cubeName,  ushort location )
+    {
+        //get the relevant cube
+        GameObject cube = transform.FindChild(cubeName).gameObject;
+
+        //set the color
+        cube.GetComponent<Renderer>().material.color = data.colorAt( location );
+
+        //activate the relevant prefab
+        string cubeTennant = "Tennant" + data.tennantAt( location );
+
+        for (int i = 0; i < cube.transform.childCount; i++)
+        {
+            GameObject t = cube.transform.GetChild(i).gameObject;
+            t.SetActive( t.name == cubeTennant ? true : false);           
+        }
+    }
+
+    public void init() {
 		data = new VirtualTile (0, 0, 0);
 		ApplyColors ();
 	}
