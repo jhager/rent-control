@@ -6,12 +6,12 @@ using System;
 [Serializable]
 public class GameEvent :EventArgs {
 
-    public int id;
+    public string id;
 	public string lastEventId;
 	public GameState gameState;
 
 	public GameEvent(GameState gameState) {
-        this.id = 1;
+        this.id = "1";
 		this.lastEventId = Guid.NewGuid().ToString();
 		this.gameState = gameState;
 	}

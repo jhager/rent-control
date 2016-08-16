@@ -6,7 +6,7 @@ using System;
  * This tile represents both the card that is in the player's hand
  * and the tile on the table.  
  */
-public class VirtualTile  {
+public class VirtualTile :EventArgs {
 
 
 	public enum Orientation {Up = 0, Clockwise90 = 1, UpsideDown = 2, CounterClockwise90 = 3};

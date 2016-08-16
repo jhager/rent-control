@@ -50,6 +50,14 @@ public class PieceDirector : MonoBehaviour {
 
 	}
 
+	private void OnNewTileEent(object sender, VirtualTile e)
+	{
+		HandTile ht = (HandTile)sender;
+		ht.OnNewTileEent -= OnNewTileEent;
+
+		SyncGame();
+	}
+
 	void ResetGame() {
 		for (int i=0; i< TOTAL_TILES; i++) {
 			allPlayerPieces [i].init();
@@ -62,6 +70,8 @@ public class PieceDirector : MonoBehaviour {
 		totalTurnCounter = 0;
 		activePiece = null;
 		gameOverText.enabled = false;
+
+		SyncGame ();
 	}
 
 	//Resets the current Player's piece.  They cannot match the pieces just
@@ -79,6 +89,14 @@ public class PieceDirector : MonoBehaviour {
 		}
 	}
 
+	void SyncGame ()
+	{
+		if (network != null) {
+			GameEvent e = new GameEvent (GetGameState ());
+			StartCoroutine (network.SendGameSate2 (e));
+		}
+	}
+
 	public void MergeRequested(HandTile piece, GameTile board, VirtualTile.Orientation orientation) {
 		//todo animate merge.
 		activePiece.SetActive (false);
@@ -91,10 +109,14 @@ public class PieceDirector : MonoBehaviour {
 			VirtualTile lastPlayedPiece = new VirtualTile(piece.GetData());
 
 			piece.MergeWithBoard (board, orientation);
+			piece.OnNewTileEent += OnNewTileEent;
+
 			currentPlayersTurn++;
 			currentPlayersTurn = currentPlayersTurn % NUMBER_OF_PLAYERS;
 
 			ResetPieces (lastPlayedPiece);
+
+			SyncGame ();
 
 			RecalculateScore ();
 
@@ -176,12 +198,15 @@ public class PieceDirector : MonoBehaviour {
 		}
 		if (Input.GetKeyDown (KeyCode.LeftArrow)) {
 			activePiece.Reorient ( VirtualTile.Orientation.CounterClockwise90);
+			SyncGame ();
 		}
 		if (Input.GetKeyDown (KeyCode.RightArrow)) {
 			activePiece.Reorient(VirtualTile.Orientation.Clockwise90);
+			SyncGame ();
 		}
 		if (Input.GetKeyDown (KeyCode.UpArrow) || Input.GetKeyDown (KeyCode.DownArrow)) {
 			activePiece.Reorient (VirtualTile.Orientation.UpsideDown);
+			SyncGame ();
 		}
 	}
 
@@ -204,10 +229,12 @@ public class PieceDirector : MonoBehaviour {
 
     public void UpdateGameState(GameState gs)
     {
-        centerBoard1.SetPieceState(gs.boards[0]);
-        centerBoard2.SetPieceState(gs.boards[1]);
+		if (gs.boards.Count == 2) {
+			centerBoard1.SetPieceState (gs.boards [0]);
+			centerBoard2.SetPieceState (gs.boards [1]);
+		}
 
-        for (int i = 0; i < TOTAL_TILES; i++)
+		for (int i = 0; i < TOTAL_TILES && i < gs.pieces.Count; i++)
         {
             if (allPlayerPieces[i] != null)
             {
@@ -215,6 +242,8 @@ public class PieceDirector : MonoBehaviour {
             }
         }
         this.totalTurnCounter = gs.turn;
+
+		RecalculateScore ();
     }
 
 	private void OnIncomingEvent(object sender, GameEvent e)

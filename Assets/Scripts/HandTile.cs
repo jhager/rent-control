@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 /**
  * Represents a tile in the hand.  It acts like a tile on the board
@@ -21,6 +22,7 @@ public class HandTile : GameTile {
 		}
 
         data = new VirtualTile ();
+		HandleNewTileEvent (data);
 		ApplyColors ();
 	}
 
@@ -137,4 +139,15 @@ public class HandTile : GameTile {
         //set the color
         cube.GetComponent<Renderer>().material.color = d;
     }
+
+	protected virtual void HandleNewTileEvent(VirtualTile e)
+	{
+		EventHandler<VirtualTile> handler = OnNewTileEent;
+		if (handler != null)
+		{
+			handler(this, e);
+		}
+	}
+
+	public event EventHandler<VirtualTile> OnNewTileEent;
 }
