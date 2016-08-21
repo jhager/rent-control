@@ -179,9 +179,13 @@ public class PieceDirector : MonoBehaviour {
 		if (Input.GetKeyDown (KeyCode.Return) && gameOverText != null && gameOverText.enabled) {
 			ResetGame ();
 		}
+		if (Input.GetKey (KeyCode.P) && Input.GetKeyDown (KeyCode.Return)) {
+			ResetGame ();
+		}
 		if (gameOverText != null && gameOverText.enabled) {
 			return;
 		}
+
 		if (Input.GetKeyDown (KeyCode.A)) {
 			AdjustActivePiece (0);
 		} else if (Input.GetKeyDown (KeyCode.S)) {
