@@ -4,6 +4,8 @@ This project is for RENT CONTROL a little hololens game about Apartment Manageme
 
 More information can be found here: https://westert.itch.io/rent-control
 
+The full Hololens application can be found here: https://github.com/thomaswester/hololens-pdx16gamejam
+
 ### Server
 
 The project optionally supports a sever.  To start a server use https://github.com/typicode/json-server  
