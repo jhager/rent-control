@@ -2,6 +2,8 @@
 
 This project is for RENT CONTROL a little hololens game about Apartment Management.  This project contains the code that is not hololens specific.  This can be run directly on a Windows or Mac laptop to view or play the game.   
 
+More information can be found here: https://westert.itch.io/rent-control
+
 ### Server
 
 The project optionally supports a sever.  To start a server use https://github.com/typicode/json-server  
